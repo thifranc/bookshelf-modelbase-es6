@@ -67,21 +67,20 @@ create: function (data, options) {
 }
 ```
 
-#### model.destroy
+#### model.destroyBy
 
 ```js
 /**
- * Destroy a model by id
+ * Destroy a model by filter
+ * @param {Object} filter
  * @param {Object} options
- * @param {String|Integer} options.id The id of the model to destroy
- * @param {Boolean} [options.require=false]
  * @return {Promise(bookshelf.Model)} empty model
  */
-destroy: function (options) {
-  options = extend({ require: true }, options);
-  return this.forge({ [this.prototype.idAttribute]: options.id })
-    .destroy(options);
-}
+destroyBy: function (filter, options = {}) {
+    options = Object.assign({ require: true }, options);
+    return this.where(this.prepareFilter(filter))
+      .destroy(options)
+  }
 ```
 
 #### model.findAll
@@ -89,27 +88,13 @@ destroy: function (options) {
 ```javascript
 /**
  * Select a collection based on a query
- * @param {Object} [query]
+ * @param {Object} filter
  * @param {Object} [options] Options used of model.fetchAll
  * @return {Promise(bookshelf.Collection)} Bookshelf Collection of Models
  */
-findAll: function (filter, options) {
-  return this.forge().where(extend({}, filter)).fetchAll(options);
-}
-```
-
-#### model.findById
-
-```javascript
-/**
- * Find a model based on it's ID
- * @param {String} id The model's ID
- * @param {Object} [options] Options used of model.fetch
- * @return {Promise(bookshelf.Model)}
- */
-findById: function (id, options) {
-  return this.findOne({ [this.prototype.idAttribute]: id }, options);
-}
+findAll: function (filter = {}, options = {}) {
+    return this.forge().where(filter).fetchAll(options)
+  }
 ```
 
 #### model.findOne
@@ -117,15 +102,14 @@ findById: function (id, options) {
 ```js
 /**
  * Select a model based on a query
- * @param {Object} [query]
+ * @param {Object} filter
  * @param {Object} [options] Options for model.fetch
- * @param {Boolean} [options.require=false]
  * @return {Promise(bookshelf.Model)}
  */
-findOne: function (query, options) {
-  options = extend({ require: true }, options);
-  return this.forge(query).fetch(options);
-}
+findOne: function (filter, options = {}) {
+    options = Object.assign({ require: true }, options);
+    return this.forge(filter).fetch(options)
+  }
 ```
 
 #### model.findOrCreate
@@ -137,37 +121,14 @@ findOne: function (query, options) {
   * @param {Object} [options.defaults] Defaults to apply to a create
   * @return {Promise(bookshelf.Model)} single Model
   */
-findOrCreate: function (data, options) {
-  return this.findOne(data, extend(options, { require: false }))
-    .bind(this)
-    .then(function (model) {
-      var defaults = options && options.defaults;
-      return model || this.create(extend(defaults, data), options);
-    });
-}
-```
-
-#### instance.getData
-
-```js
-/**
- * Used to retrieve data from a class instance
- * @param {Array} fields
- * @return {Object({field: value})}
- */
-getData: function (requiredFields) {
-    let fetchedData = {};
-
-    requiredFields.forEach( field => {
-        if (field === 'id') {
-          fetchedData[field] = this.attributes[this.idAttribute];
-        } else {
-          fetchedData[field] = this.attributes[field];
-        }
-      }
-    );
-    return fetchedData;
-}
+findOrCreate: function (data, options = {}) {
+    return this.findOne(data, Object.assign(options, { require: false }))
+      .bind(this)
+      .then(function (model) {
+        const defaults = options && options.defaults;
+        return model || this.create(Object.assign(defaults, data), options)
+      })
+  }
 ```
 
 #### model.updateBy
@@ -192,6 +153,25 @@ updateBy: function (filter, data, options = {}) {
   }
 ```
 
+#### model.updateById
+
+```js
+/**
+ * Update a model based on data
+ * @param {Integer} id
+ * @param {Object} data Data to be updated
+ * @param {Object} options Options for model.fetch and model.save
+ * @return {Promise(bookshelf.Model)}
+ */
+updateById: function (id, data, options = {}) {
+    options = Object.assign({ patch: true, require: true }, options);
+    return this.forge({[this.prototype.idAttribute]: id}).fetch(options)
+      .then(function (model) {
+        return model ? model.save(data, options) : undefined
+      })
+  }
+```
+
 #### model.upsert
 ```js
 /**
@@ -200,19 +180,44 @@ updateBy: function (filter, data, options = {}) {
  * @param {Object} updateData Data for update
  * @param {Object} [options] Options for model.save
  */
-upsert: function (selectData, updateData, options) {
-  return this.findOne(selectData, extend(options, { require: false }))
-    .bind(this)
-    .then(function (model) {
-      return model
-        ? model.save(
-          updateData,
-          extend({ patch: true, method: 'update' }, options)
-        )
-        : this.create(
-          extend(selectData, updateData),
-          extend(options, { method: 'insert' })
-        )
-    });
+upsert: function (selectData, updateData, options = {}) {
+    return this.findOne(selectData, Object.assign(options, { require: false }))
+      .bind(this)
+      .then(function (model) {
+        return model
+          ? model.save(
+            updateData,
+            Object.assign({ patch: true, method: 'update' }, options)
+          )
+          : this.create(
+            Object.assign(selectData, updateData),
+            Object.assign(options, { method: 'insert' })
+          )
+      })
+  }
+
+}
+```
+
+#### instance.getData
+
+```js
+/**
+ * Used to retrieve data from a class instance
+ * @param {Array} fields
+ * @return {Object({field: value})}
+ */
+getData: function (requiredFields) {
+    let fetchedData = {};
+
+    requiredFields.forEach( field => {
+        if (field === 'id') {
+          fetchedData[field] = this.attributes[this.idAttribute];
+        } else {
+          fetchedData[field] = this.attributes[field];
+        }
+      }
+    );
+    return fetchedData;
 }
 ```
