@@ -205,7 +205,7 @@ upsert: function (selectData, updateData, options = {}) {
 /**
  * Used to retrieve data from a class instance
  * @param {Array} fields
- * @return {Object({field: value})}
+ * @return {Object({field: value, ...})}
  */
 getData: function (requiredFields) {
     let fetchedData = {};
