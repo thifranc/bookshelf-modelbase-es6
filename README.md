@@ -19,6 +19,11 @@ your bookshelf instance that will break `bookshelf-modelbase-es6`.
 * Naive CRUD methods - `findAll`, `findOne`, `findOrCreate`, `create`, `update`, and `destroy`
 
 ## Usage
+Please note that you should change the first line of modelBase.js
+as the import I use is certainly not the same as you.
+```
+import Bookshelf from './bookshelfClient';
+```
 ```javascript
 import Joi from 'joi';
 import modelBase  from '../modelBase';
