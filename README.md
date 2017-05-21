@@ -1,4 +1,5 @@
 # bookshelf-modelbase-es6
+Full credits should go to [bookshelf-modelbase](https://github.com/bsiddiqui/bookshelf-modelbase) as I just have translated their code.
 
 ## Why
 [bookshelf-modelbase](https://github.com/bsiddiqui/bookshelf-modelbase) is awesome. However, it does not exist in es6 syntax.
