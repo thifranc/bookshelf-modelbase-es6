@@ -54,6 +54,12 @@ export default User;
 
 ### API
 
+```
+Every time filter is in params, prepareFilter function is used.
+Thus you can pass "id" as key to mean your idAttribute.
+```
+
+
 #### model.create
 
 ```js

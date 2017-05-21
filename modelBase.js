@@ -53,10 +53,6 @@ class modelBase extends Bookshelf.Model{
     }
   }
 
-  //getData : Used to retrieve data from a class instance
-  //[requiredFields] : [field1, ...], array of fieldnames whose values will be retrieved
-  //NOTE: You can pass only id to retrieve the primary key
-  //return : {field1:value1, ...}, object where key is fieldname, and value is the corresponding value
   getData (requiredFields) {
     let fetchedData = {};
 
@@ -83,13 +79,6 @@ class modelBase extends Bookshelf.Model{
     return this.forge(data).save(null, options);
   }
 
-  //updateBy(filter, data, options) : Used to update data for all filter-matching rows
-  //[filter] : {field1:value1, ...}, object mapping fieldname with values to filter query
-  //NOTE: You can pass only id to retrieve the primary key
-  //[data] : {field1:value1, ...}, object mapping fieldname with values to update
-  //NOTE: You can pass only id to retrieve the primary key
-  //[option] : refer to bookshelf
-  //return : a promise mais je sais plus quoi
   static updateBy(filter, data, options = {}) {
     options = Object.assign({ patch: true, require: true }, options);
     return this.forge(this.prepareFilter(filter)).fetch(options)
