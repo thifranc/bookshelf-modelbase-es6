@@ -104,7 +104,7 @@ class modelBase extends Bookshelf.Model{
 
   static findOne(filter, options = {}) {
     options = Object.assign({ require: true }, options);
-    return this.forge(filter).fetch(options)
+    return this.forge(this.prepareFilter(filter)).fetch(options)
   }
 
   static destroyBy(filter, options = {}) {
